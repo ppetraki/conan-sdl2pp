@@ -6,7 +6,6 @@ from conans.errors import ConanInvalidConfiguration
 
 class PackageConfig:
   _data = {
-      # XXX override with compiler.cppstd
       "cxxstd":
       {
         "default": "c++11",
@@ -21,13 +20,13 @@ class PackageConfig:
       },
       "with_image":
       {
-        "default": True,
+        "default": False,
         "conan_options": [True, False],
         "cmake_key":"SDL2PP_WITH_IMAGE"
       },
       "with_mixer":
       {
-        "default": True,
+        "default": False,
         "conan_options": [True, False],
         "cmake_key": "SDL2PP_WITH_MIXER"
       },
@@ -83,7 +82,7 @@ class SDL2ppConan(ConanFile):
     version         = "0.16.0"
     license         = "MIT"
     author          = "Peter M. Petrakis  peter.petrakis@protonmail.com"
-    url             = "https://github.com/libSDL2pp/libSDL2pp.git"
+    url             = "https://sdl2pp.amdmi3.ru"
     description     = "C++11 bindings/wrapper for SDL2"
     topics          = ("gui", "modern-cpp", "cross-platform")
     settings = "os", "arch", "compiler", "build_type"
