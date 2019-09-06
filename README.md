@@ -1,0 +1,1 @@
+- only drive test_package with the optional flags used in the parent build

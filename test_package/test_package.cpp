@@ -1,6 +1,5 @@
 #include <SDL2pp/SDL.hh>
 #include <SDL2pp/Exception.hh>
-#include <SDL2pp/Font.hh>
 #include <SDL2pp/RWops.hh>
 
 #ifdef WITH_IMAGE
@@ -12,6 +11,7 @@
 #endif
 
 #ifdef WITH_TTF
+#include <SDL2pp/Font.hh>
 #include <SDL2pp/SDLTTF.hh>
 #endif
 
@@ -33,6 +33,8 @@ static void throw_exception(const char * message, const char * name)
 #ifdef WITH_TTF
 static void check_ttf()
 {
+    SDL sdl(SDL_INIT_VIDEO);
+
     std::cout << "checking font\n";
     SDLTTF sdl_ttf;
 
@@ -56,6 +58,7 @@ static void check_ttf()
 // resolve the symbol and bring the subsystem online.
 static void check_image()
 {
+    SDL sdl(SDL_INIT_VIDEO);
     bool found = false;
 
     std::cout << "checking image\n";
@@ -74,6 +77,7 @@ static void check_image()
 #ifdef WITH_MIXER
 static void check_mixer()
 {
+    SDL sdl(SDL_INIT_AUDIO);
     bool found = false;
     std::cout << "checking mixer\n";
     SDLImage mixer();
@@ -88,8 +92,9 @@ static void check_mixer()
 #endif
 
 int main(int argc, char* argv[]) try {
-  SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-
+  {
+    SDL sdl();
+  }
 #ifdef WITH_IMAGE
   check_image();
 #endif
