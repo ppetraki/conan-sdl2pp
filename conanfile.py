@@ -120,4 +120,4 @@ class SDL2ppConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = [self.name]
+        self.cpp_info.libs = ["SDL2pp"]
