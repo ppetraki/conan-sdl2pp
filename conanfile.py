@@ -4,8 +4,9 @@
 from conans import ConanFile, CMake, tools
 from conans.errors import ConanInvalidConfiguration
 
-class Definitions:
+class PackageConfig:
   _data = {
+      # XXX override with compiler.cppstd
       "cxxstd":
       {
         "default": "c++11",
@@ -38,7 +39,7 @@ class Definitions:
       },
       "with_tests":
       {
-        "default": True,
+        "default": False,
         "conan_options": [True, False],
         "cmake_key" : "SDL2PP_WITH_TESTS"
       },
@@ -50,7 +51,7 @@ class Definitions:
       },
       "enable_livetests":
       {
-        "default": True,
+        "default": False,
         "conan_options": [True, False],
         "cmake_key": "SDL2PP_ENABLE_LIVE_TESTS"
       },
@@ -85,17 +86,16 @@ class SDL2ppConan(ConanFile):
     url             = "https://github.com/libSDL2pp/libSDL2pp.git"
     description     = "C++11 bindings/wrapper for SDL2"
     topics          = ("gui", "modern-cpp", "cross-platform")
-    settings = "os", "arch", "compiler", "build_type", "cppstd"
+    settings = "os", "arch", "compiler", "build_type"
     generators = ['cmake']
 
     requires = "sdl2/2.0.8@bincrafters/stable"
 
     _source_subfolder = "source_subfolder"
-    _build_subfolder = "build_subfolder"
     _upstream   = "https://github.com/libSDL2pp/libSDL2pp.git"
     _tag        = "0.16.0"
 
-    defs = Definitions()
+    defs = PackageConfig()
     default_options = defs.generate_default_options()
     options = defs.generate_options()
 
@@ -106,19 +106,20 @@ class SDL2ppConan(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        defs = Definitions()
+        defs = PackageConfig()
         defs.populate_cmake_configuration(self.options, cmake)
-        cmake.configure(build_dir=self._build_subfolder)
+        cmake.configure(source_folder=self._source_subfolder)
         return cmake
 
     def build(self):
         cmake = self._configure_cmake()
         cmake.build()
-        cmake.test()
+        if self.options.with_tests:
+          cmake.test()
 
     def package(self):
         cmake = self._configure_cmake()
-        cmake.install(build_dir=self._build_subfolder)
+        cmake.install()
 
     def package_info(self):
         self.cpp_info.libs = [self.name]

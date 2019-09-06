@@ -1,22 +1,27 @@
 PROJECT_NAME:=sdl2pp
 PROJECT_VERSION:=0.16.0
 
+SRC_FOLDER:=tmp/source
+BUILD_FOLDER:=tmp/build
+INSTALL_FOLDER:=$(BUILD_FOLDER)
+PACKAGE_FOLDER:=tmp/package
+
 all: clean source install build package
 
 clean:
 	rm -rf tmp
 
 source:
-	conan source . --source-folder=tmp/source
+	conan source . --source-folder=$(SRC_FOLDER)
 
 install:
-	conan install  . --install-folder=tmp/build
+	conan install  . --install-folder=$(INSTALL_FOLDER)
 
 build:
-	conan build . --source-folder=tmp/source --build-folder=tmp/build
+	conan build . --source-folder=$(SRC_FOLDER) --build-folder=$(BUILD_FOLDER)
 
 package:
-	conan package . -sf=tmp/source -bf=tmp/build -pf=tmp/package
+	conan package . -sf=$(SRC_FOLDER) -bf=$(BUILD_FOLDER) -pf=$(PACKAGE_FOLDER)
 
 # when you're satisfied that the package is correct, install it for real
 package-install: package-uninstall
