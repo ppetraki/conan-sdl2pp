@@ -57,24 +57,24 @@ class PackageConfig:
       },
   }
 
-  def generate_options(self):
+  @staticmethod
+  def generate_options():
     options = {}
-    for k,v in self._data.items():
+    for k,v in PackageConfig._data.items():
       options[k] = v["conan_options"]
     return options
 
-  def generate_default_options(self):
+  @staticmethod
+  def generate_default_options():
     default_options = {}
-    for k,v in self._data.items():
+    for k,v in PackageConfig._data.items():
       default_options[k] = v["default"]
     return default_options
 
-  def populate_cmake_configuration(self, options, cmake_ref):
+  @staticmethod
+  def populate_cmake_configuration(options, cmake_ref):
     for k, v in options.items():
-      print("SELFOPT {} {}".format(k, v))
-
-    for k, v in options.items():
-      cmake_key = self._data[k]["cmake_key"]
+      cmake_key = PackageConfig._data[k]["cmake_key"]
       cmake_ref.definitions[cmake_key] = v
 
 
@@ -95,9 +95,8 @@ class SDL2ppConan(ConanFile):
     _upstream   = "https://github.com/libSDL2pp/libSDL2pp.git"
     _tag        = "0.16.0"
 
-    defs = PackageConfig()
-    default_options = defs.generate_default_options()
-    options = defs.generate_options()
+    default_options = PackageConfig.generate_default_options()
+    options = PackageConfig.generate_options()
 
     def source(self):
         self.run("rm -rf %s" % self._source_subfolder)
@@ -106,8 +105,7 @@ class SDL2ppConan(ConanFile):
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        defs = PackageConfig()
-        defs.populate_cmake_configuration(self.options, cmake)
+        PackageConfig.populate_cmake_configuration(self.options, cmake)
         cmake.configure(source_folder=self._source_subfolder)
         return cmake
 
