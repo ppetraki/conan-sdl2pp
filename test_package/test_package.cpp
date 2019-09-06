@@ -3,6 +3,14 @@
 #include <SDL2pp/Font.hh>
 #include <SDL2pp/RWops.hh>
 
+#ifdef WITH_IMAGE
+#include <SDL2pp/SDLImage.hh>
+#endif
+
+#ifdef WITH_MIXER
+#include <SDL2pp/SDLMixer.hh>
+#endif
+
 #ifdef WITH_TTF
 #include <SDL2pp/SDLTTF.hh>
 #endif
@@ -22,6 +30,7 @@ static void throw_exception(const char * message, const char * name)
     throw std::runtime_error(s.str().c_str());
 }
 
+#ifdef WITH_TTF
 static void check_ttf()
 {
     std::cout << "checking font\n";
@@ -35,20 +44,58 @@ static void check_ttf()
       found = true;
     }
 
-    if (!found)
+    if (!found) {
         throw_exception("Failed to get font!", "ttf");
+    }
     std::cout << "OK!" << std::endl;
 }
+#endif
+
+#ifdef WITH_IMAGE
+// this requires drawing to the screen so just test that we can
+// resolve the symbol and bring the subsystem online.
+static void check_image()
+{
+    bool found = false;
+
+    std::cout << "checking image\n";
+    SDLImage image();
+    // if we didn't throw we're ok
+    found = true;
+
+    if (!found) {
+      throw_exception("Failed to get image!", "image");
+    }
+    std::cout << "OK!" << std::endl;
+}
+#endif
+
+
+#ifdef WITH_MIXER
+static void check_mixer()
+{
+    bool found = false;
+    std::cout << "checking mixer\n";
+    SDLImage mixer();
+    // if we didn't throw we're ok
+    found = true;
+
+    if (!found) {
+      throw_exception("Failed to get mixer!", "mixer");
+    }
+    std::cout << "OK!" << std::endl;
+}
+#endif
 
 int main(int argc, char* argv[]) try {
   SDL sdl(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 
 #ifdef WITH_IMAGE
-  check_video_driver("x11");
+  check_image();
 #endif
 
 #ifdef WITH_MIXER
-  check_audio_driver("alsa");
+  check_mixer();
 #endif
 
 #ifdef WITH_TTF

@@ -20,13 +20,13 @@ class PackageConfig:
       },
       "with_image":
       {
-        "default": False,
+        "default": True,
         "conan_options": [True, False],
         "cmake_key":"SDL2PP_WITH_IMAGE"
       },
       "with_mixer":
       {
-        "default": False,
+        "default": True,
         "conan_options": [True, False],
         "cmake_key": "SDL2PP_WITH_MIXER"
       },
