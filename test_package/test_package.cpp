@@ -23,78 +23,63 @@
 
 using namespace SDL2pp;
 
-static void throw_exception(const char * message, const char * name)
-{
-    std::stringstream s;
-    s << message << " - " << name;
-    throw std::runtime_error(s.str().c_str());
+static void throw_exception(const char* message, const char* name) {
+  std::stringstream s;
+  s << message << " - " << name;
+  throw std::runtime_error(s.str().c_str());
 }
 
 #ifdef WITH_TTF
-static void check_ttf()
-{
-    SDL sdl(SDL_INIT_VIDEO);
+static void check_ttf() {
+  SDL sdl(SDL_INIT_VIDEO);
 
-    std::cout << "checking font\n";
-    SDLTTF sdl_ttf;
+  std::cout << "checking font\n";
+  SDLTTF sdl_ttf;
 
-    bool found = false;
-    auto rwops = RWops::FromFile(TESTDATA_DIR "/Vera.ttf");
-    Font font_by_rw(rwops, 30);
+  bool found = false;
+  auto rwops = RWops::FromFile(TESTDATA_DIR "/Vera.ttf");
+  Font font_by_rw(rwops, 30);
 
-    if (font_by_rw.Get()) {
-      found = true;
-    }
+  if (font_by_rw.Get()) { found = true; }
 
-    if (!found) {
-        throw_exception("Failed to get font!", "ttf");
-    }
-    std::cout << "OK!" << std::endl;
+  if (!found) { throw_exception("Failed to get font!", "ttf"); }
+  std::cout << "OK!" << std::endl;
 }
 #endif
 
 #ifdef WITH_IMAGE
 // this requires drawing to the screen so just test that we can
 // resolve the symbol and bring the subsystem online.
-static void check_image()
-{
-    SDL sdl(SDL_INIT_VIDEO);
-    bool found = false;
+static void check_image() {
+  SDL  sdl(SDL_INIT_VIDEO);
+  bool found = false;
 
-    std::cout << "checking image\n";
-    SDLImage image();
-    // if we didn't throw we're ok
-    found = true;
+  std::cout << "checking image\n";
+  SDLImage image();
+  // if we didn't throw we're ok
+  found = true;
 
-    if (!found) {
-      throw_exception("Failed to get image!", "image");
-    }
-    std::cout << "OK!" << std::endl;
+  if (!found) { throw_exception("Failed to get image!", "image"); }
+  std::cout << "OK!" << std::endl;
 }
 #endif
 
-
 #ifdef WITH_MIXER
-static void check_mixer()
-{
-    SDL sdl(SDL_INIT_AUDIO);
-    bool found = false;
-    std::cout << "checking mixer\n";
-    SDLImage mixer();
-    // if we didn't throw we're ok
-    found = true;
+static void check_mixer() {
+  SDL  sdl(SDL_INIT_AUDIO);
+  bool found = false;
+  std::cout << "checking mixer\n";
+  SDLImage mixer();
+  // if we didn't throw we're ok
+  found = true;
 
-    if (!found) {
-      throw_exception("Failed to get mixer!", "mixer");
-    }
-    std::cout << "OK!" << std::endl;
+  if (!found) { throw_exception("Failed to get mixer!", "mixer"); }
+  std::cout << "OK!" << std::endl;
 }
 #endif
 
 int main(int argc, char* argv[]) try {
-  {
-    SDL sdl();
-  }
+  { SDL sdl(); }
 #ifdef WITH_IMAGE
   check_image();
 #endif
