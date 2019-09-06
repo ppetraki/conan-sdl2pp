@@ -88,6 +88,7 @@ class SDL2ppConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     generators = ['cmake']
 
+    # XXX newer versions blowup on Android due to hid linking issue
     requires = "sdl2/2.0.8@bincrafters/stable"
 
     _source_subfolder = "source_subfolder"

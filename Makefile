@@ -1,8 +1,11 @@
 PROJECT_NAME:=sdl2pp
 PROJECT_VERSION:=0.16.0
 
-PROFILE:=
+#_PROFILE:=-pr arm2
+PROFILE:=$(_PROFILE)
+
 CHANNEL:=ppetraki
+RELEASE:=testing
 SRC_FOLDER:=tmp/source
 BUILD_FOLDER:=tmp/build
 INSTALL_FOLDER:=$(BUILD_FOLDER)
@@ -17,7 +20,7 @@ source:
 	conan source . --source-folder=$(SRC_FOLDER)
 
 install:
-	conan install  . --install-folder=$(INSTALL_FOLDER)
+	conan install  . --install-folder=$(INSTALL_FOLDER) $(PROFILE)
 
 build:
 	conan build . --source-folder=$(SRC_FOLDER) --build-folder=$(BUILD_FOLDER)
@@ -30,16 +33,15 @@ export-package:
 		--build-folder=$(BUILD_FOLDER) $(PROFILE)
 
 test: export-package
-	conan test test_package $(PROJECT_NAME)/$(PROJECT_VERSION)@$(CHANNEL)/$(PROJECT_NAME)
-
+	conan test test_package $(PROJECT_NAME)/$(PROJECT_VERSION)@$(CHANNEL)/$(RELEASE)
 
 # when you're satisfied that the package is correct, install it for real
 package-install: package-uninstall
-	conan create   . $(CHANNEL)/$(PROJECT_NAME) -s build_type=Release
-	conan create   . $(CHANNEL)/$(PROJECT_NAME) -s build_type=Debug
+	conan create   . $(CHANNEL)/$(RELEASE) --build missing -s build_type=Release $(PROFILE)
+	conan create   . $(CHANNEL)/$(RELEASE) --build missing -s build_type=Debug  $(PROFILE)
 
 package-uninstall:
 	# always exit with success because you could have removed
 	# it manually ahead of time which will cause package-install to
 	# fail as this dependent rule will fail first
-	conan remove -f $(PROJECT_NAME)/$(PROJECT_VERSION)@$(CHANNEL)/$(PROJECT_NAME) || :
+	conan remove -f $(PROJECT_NAME)/$(PROJECT_VERSION)@$(CHANNEL)/$(RELEASE) || :
