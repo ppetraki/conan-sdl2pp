@@ -79,33 +79,48 @@ class PackageConfig:
 class SDL2ppConan(ConanFile):
     name = "sdl2pp"
     version = "0.16.0"
-    license = "MIT"
-    author = "Peter M. Petrakis  peter.petrakis@protonmail.com"
-    url = "https://sdl2pp.amdmi3.ru"
     description = "C++11 bindings/wrapper for SDL2"
+    url = "https://github/ppetraki/conan-sdl2pp"
+    homepage = "https://sdl2pp.amdmi3.ru"
+    author = "Peter M. Petrakis  peter.petrakis@protonmail.com"
+    license = "MIT"
     topics = ("gui", "modern-cpp", "cross-platform")
-    settings = "os", "arch", "compiler", "build_type"
+
+    # Turns the upstream project into a subproject which allows
+    # us to inject the conan environment definitions.
+    #
+    # Requires CONAN_INSTALL_FOLDER, who's value is determined
+    # at runtime
+    exports_sources = ['CMakeLists.txt']
+
     generators = ['cmake']
 
-    # XXX newer versions blowup on Android due to hid linking issue
-    requires = "sdl2/2.0.8@bincrafters/stable"
-
+    _build_subfolder = "build_subfolder"
     _source_subfolder = "source_subfolder"
-    _upstream = "https://github.com/libSDL2pp/libSDL2pp.git"
-    _tag = "0.16.0"
 
-    default_options = PackageConfig.generate_default_options()
+    settings = "os", "arch", "compiler", "build_type"
     options = PackageConfig.generate_options()
+    default_options = PackageConfig.generate_default_options()
+
+    def requirements(self):
+      # XXX newer versions blowup on Android due to hid linking issue
+      self.requires.add("sdl2/2.0.8@bincrafters/stable")
 
     def source(self):
+        tag = "0.16.0"
+        upstream = "https://github.com/libSDL2pp/libSDL2pp.git"
         self.run("rm -rf %s" % self._source_subfolder)
         self.run("git clone --branch %s  -- %s %s" %
-                 (self._tag, self._upstream, self._source_subfolder))
+                 (tag, upstream, self._source_subfolder))
 
     def _configure_cmake(self):
         cmake = CMake(self)
+        # necessary for our nested project style, otherwise we can't
+        # find the conan definitions. Ignore JEDI complaining that the
+        # install_folder variable doesn't exist, it will at runtime.
+        cmake.definitions['CONAN_INSTALL_FOLDER'] = self.install_folder
         PackageConfig.populate_cmake_configuration(self.options, cmake)
-        cmake.configure(source_folder=self._source_subfolder)
+        cmake.configure(build_dir=self._build_subfolder)
         return cmake
 
     def build(self):
@@ -116,7 +131,7 @@ class SDL2ppConan(ConanFile):
 
     def package(self):
         cmake = self._configure_cmake()
-        cmake.install()
+        cmake.install(build_dir=self._build_subfolder)
 
     def package_info(self):
         self.cpp_info.libs = ["SDL2pp"]
