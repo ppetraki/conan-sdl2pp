@@ -1,0 +1,52 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2a02376..a703a01 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -15,15 +15,18 @@ SET(SDL2PP_VERSION "${SDL2PP_MAJOR_VERSION}.${SDL2PP_MINOR_VERSION}.${SDL2PP_PAT
+ # we hide these under following options
+ OPTION(SDL2PP_WITH_WERROR "Make warnings fatal" OFF)
+ 
+-SET(SDL2PP_CXXSTD "c++11" CACHE STRING "Used c++ standard")
++# conan option may override this
++IF(NOT DEFINED CONAN_EXPORTED)
++  SET(SDL2PP_CXXSTD "c++11" CACHE STRING "Used c++ standard")
++ENDIF(NOT DEFINED CONAN_EXPORTED)
+ 
+-IF(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
++IF((CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR (NOT DEFINED CONAN_EXPORTED))
+ 	OPTION(SDL2PP_WITH_IMAGE "Enable SDL2_image support" ON)
+ 	OPTION(SDL2PP_WITH_TTF "Enable SDL2_ttf support" ON)
+ 	OPTION(SDL2PP_WITH_MIXER "Enable SDL2_mixer support" ON)
+-ELSE(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+-	# please set SDL2PP_WITH_IMAGE, SDL2PP_WITH_TTF, SDL2PP_WITH_MIXER in parent project as needed
+-ENDIF(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
++ELSE((CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR (NOT DEFINED CONAN_EXPORTED))
++  MESSAGE("please set SDL2PP_WITH_IMAGE, SDL2PP_WITH_TTF, SDL2PP_WITH_MIXER in parent project as needed")
++ENDIF((CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR (NOT DEFINED CONAN_EXPORTED))
+ 
+ # depends
+ FIND_PACKAGE(SDL2 REQUIRED)
+@@ -209,12 +212,17 @@ ENDIF(SDL2PP_WITH_MIXER)
+ # targets
+ INCLUDE(GenerateExportHeader)
+ 
+-IF(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+-	# options
+-	OPTION(SDL2PP_WITH_EXAMPLES "Build examples" ON)
+-	OPTION(SDL2PP_WITH_TESTS "Build tests" ON)
+-	OPTION(SDL2PP_ENABLE_LIVE_TESTS "Enable live tests (require X11 display and audio device)" ON)
+-	OPTION(SDL2PP_STATIC "Build static library instead of shared one" OFF)
++IF((CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR) OR (DEFINED CONAN_EXPORTED))
++  # let the conan options drive it
++  IF(NOT DEFINED CONAN_EXPORTED)
++    # options
++    OPTION(SDL2PP_WITH_EXAMPLES "Build examples" ON)
++    OPTION(SDL2PP_WITH_TESTS "Build tests" ON)
++    OPTION(SDL2PP_ENABLE_LIVE_TESTS "Enable live tests (require X11 display and audio device)" ON)
++    OPTION(SDL2PP_STATIC "Build static library instead of shared one" OFF)
++  ELSE(NOT DEFINED CONAN_EXPORTED)
++    MESSAGE("leaving options alone")
++  ENDIF()
+ 
+ 	# library
+ 	IF(SDL2PP_STATIC)
