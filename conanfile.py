@@ -16,7 +16,7 @@ class PackageConfig:
         },
         "static":
         {
-            "default": False,
+            "default": True,
             "conan_options": [True, False],
             "cmake_key": "SDL2PP_STATIC"
         },
@@ -75,9 +75,7 @@ class PackageConfig:
     @staticmethod
     def populate_cmake_configuration(options, cmake_ref):
         for k, v in options.items():
-            print("incoming conan options {}={}".format(k, v))
             cmake_key = PackageConfig._data[k]["cmake_key"]
-            print("setting cmake {}={}".format(cmake_key, v))
             cmake_ref.definitions[cmake_key] = v
 
 
