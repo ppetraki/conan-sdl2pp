@@ -45,3 +45,6 @@ package-uninstall:
 	# it manually ahead of time which will cause package-install to
 	# fail as this dependent rule will fail first
 	conan remove -f $(PROJECT_NAME)/$(PROJECT_VERSION)@$(CHANNEL)/$(RELEASE) || :
+
+format:
+	autopep8 -i conanfile.py
