@@ -3,7 +3,10 @@
 
 from conans import ConanFile, CMake, tools
 
+
 class PackageConfig:
+    # XXX add a function to generate a table in markdown format
+    # XXX add description field
     _data = {
         "cxxstd":
         {
@@ -77,6 +80,7 @@ class PackageConfig:
             print("setting cmake {}={}".format(cmake_key, v))
             cmake_ref.definitions[cmake_key] = v
 
+
 class SDL2ppConan(ConanFile):
     name = "sdl2pp"
     version = "0.16.0"
@@ -87,11 +91,22 @@ class SDL2ppConan(ConanFile):
     license = "MIT"
     topics = ("gui", "modern-cpp", "cross-platform")
 
-    # Turns the upstream project into a subproject which allows
-    # us to inject the conan environment definitions.
+    # The CMakeLists.txt turns the upstream project into
+    # a subproject which allows us to inject the conan
+    # environment definitions.
     #
     # Requires CONAN_INSTALL_FOLDER, who's value is determined
     # at runtime
+    #
+    # The patch makes sure our options aren't overridden by upstream
+    # There is also some intrinsic behavior that prevented the build
+    # from producing install targets now that it's a subproject.
+    #
+    # XXX refactor upstream patch to detect conan environment and load
+    # defs conditionally. Then we can dump the parent cmake file and
+    # there will be less conditions in the upstream cmake as we'll
+    # just enable conan *after* the project sets it's defaults so we
+    # can get our config in.
     exports_sources = ['CMakeLists.txt', 'cmake.patch']
 
     generators = ['cmake']
@@ -103,16 +118,15 @@ class SDL2ppConan(ConanFile):
     options = PackageConfig.generate_options()
     default_options = PackageConfig.generate_default_options()
 
-    def _verify_options(self, stage: str):
+    def _verify_options(self, stage):
         print("======== begin-stage {} ===========".format(stage))
-        for k,v in self.options.items():
-          print("self.options {} = {}".format(k,v))
+        for k, v in self.options.items():
+            print("self.options {} = {}".format(k, v))
         print("======== end-stage {} ===========".format(stage))
 
     def requirements(self):
         # XXX newer versions blowup on Android due to hid linking issue
         self.requires.add("sdl2/2.0.8@bincrafters/stable")
-        self._verify_options("requirements")
 
     def source(self):
         tag = "0.16.0"
@@ -121,23 +135,21 @@ class SDL2ppConan(ConanFile):
         self.run("git clone --branch %s  -- %s %s" %
                  (tag, upstream, self._source_subfolder))
         tools.patch(base_path=self._source_subfolder, patch_file="cmake.patch")
-        self._verify_options("source")
 
     def _configure_cmake(self):
         cmake = CMake(self)
-        # necessary for our nested project style, otherwise we can't
-        # find the conan definitions. Ignore JEDI complaining that the
-        # install_folder variable doesn't exist, it will at runtime.
+        # CONAN_INSTALL_FOLDER is necessary for our nested project style
+        # workaround. Otherwise we can't find the conan definitions.
+        #
+        # Ignore JEDI complaining that the install_folder variable doesn't
+        # exist, it will at runtime.
         cmake.definitions['CONAN_INSTALL_FOLDER'] = self.install_folder
-        self._verify_options("pre populate configure_cmake")
         PackageConfig.populate_cmake_configuration(self.options, cmake)
-        self._verify_options("post populate configure_cmake")
         cmake.configure(build_dir=self._build_subfolder)
         return cmake
 
     def build(self):
         cmake = self._configure_cmake()
-        self._verify_options("build")
         cmake.build()
         if self.options.with_tests:
             cmake.test()
