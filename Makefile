@@ -11,6 +11,12 @@ BUILD_FOLDER:=tmp/build
 INSTALL_FOLDER:=$(BUILD_FOLDER)
 PACKAGE_FOLDER:=tmp/package
 
+# Cross building can be irritating
+# https://github.com/conan-io/conan/issues/2355
+ifneq ($(_PROFILE),)
+	SKIP_TEST:=-tf None
+endif
+
 all: clean source install build package
 
 clean:
@@ -37,8 +43,8 @@ test: export-package
 
 # when you're satisfied that the package is correct, install it for real
 package-install: package-uninstall
-	conan create   . $(CHANNEL)/$(RELEASE) --build=missing -s build_type=Release $(PROFILE)
-	conan create   . $(CHANNEL)/$(RELEASE) --build=missing -s build_type=Debug  $(PROFILE)
+	conan create . $(CHANNEL)/$(RELEASE) $(SKIP_TEST) --build=outdated  -s build_type=Release $(PROFILE)
+	conan create . $(CHANNEL)/$(RELEASE) $(SKIP_TEST) --build=outdated  -s build_type=Debug  $(PROFILE)
 
 package-uninstall:
 	# always exit with success because you could have removed
