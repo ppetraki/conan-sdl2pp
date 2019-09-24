@@ -39,3 +39,5 @@ tmp/
 # IDE
 .idea/*
 .ropeproject/*
+
+table.md

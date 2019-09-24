@@ -1,0 +1,41 @@
+options:
+  cxxstd:
+    default: c++11
+    description: Used c++ standard
+    type: string
+    cmake_key: SDL2PP_CXXSTD
+  static:
+    default: true
+    description: Build static library instead of shared one
+    type: boolean
+    cmake_key: SDL2PP_STATIC
+  with_image:
+    default: false
+    description: Enable SDL2_image support
+    type: boolean
+    cmake_key: SDL2PP_WITH_IMAGE
+  with_mixer:
+    default: false
+    description: Enable SDL2_ttf support
+    type: boolean
+    cmake_key: SDL2PP_WITH_MIXER
+  with_ttf:
+    default: false
+    description: Enable SDL2_mixer support
+    type: boolean
+    cmake_key: SDL2PP_WITH_TTF
+  with_tests:
+    default: false
+    description: Build tests
+    type: boolean
+    cmake_key: SDL2PP_WITH_TESTS
+  with_examples:
+    default: false
+    description: Build examples
+    type: boolean
+    cmake_key: SDL2PP_WITH_EXAMPLES
+  enable_livetests:
+    default: false
+    description: Enable live tests (require X11 display and audio device)
+    type: boolean
+    cmake_key: SDL2PP_ENABLE_LIVE_TESTS
