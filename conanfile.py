@@ -2,84 +2,126 @@
 # -*- coding: utf-8 -*-
 
 from conans import ConanFile, CMake, tools
+import yaml
+
+# Make your package default changes here or on the CLI
+# It would be much nicer to provide this as a seperate file but
+# alas conan makes this very difficult, even with adding this
+# to the exports list.
+CONFIG_YAML = """
+options:
+  cxxstd:
+    description: Used c++ standard
+    default: c++11
+    type: string
+    cmake_key: SDL2PP_CXXSTD
+  static:
+    description: Build static library instead of shared one
+    default: true
+    type: boolean
+    cmake_key: SDL2PP_STATIC
+  with_image:
+    description: Enable SDL2_image support
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_WITH_IMAGE
+  with_mixer:
+    description: Enable SDL2_ttf support
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_WITH_MIXER
+  with_ttf:
+    description: Enable SDL2_mixer support
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_WITH_TTF
+  with_tests:
+    description: Build tests
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_WITH_TESTS
+  with_examples:
+    description: Build examples
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_WITH_EXAMPLES
+  enable_livetests:
+    description: Enable live tests (require X11 display and audio device)
+    default: false
+    type: boolean
+    cmake_key: SDL2PP_ENABLE_LIVE_TESTS
+"""
+
+class ConfigItem:
+    def parse_options(self):
+        if self.conan_type == 'boolean':
+            # the value is already a valid boolean
+            self.conan_type = [True, False]
+        elif self.conan_type == 'int':
+            self.default = int(self.default)
+            self.conan_type = 'Integer'
+        elif self.conan_type == 'float':
+            self.default = float(self.default)
+            self.conan_type = 'Float'
+        elif self.conan_type == 'string':
+            self.default = str(self.default)
+            self.conan_type = 'ANY'
+        else:
+            raise Exception("unsupported type: {0}".format(self.conan_type))
+
+    def __init__(self, name, dictionary):
+        self.name = name
+        self.conan_type = dictionary.get('type')
+        self.default = dictionary.get('default')
+        self.description = dictionary.get('description')
+        self.cmake_key = str(dictionary.get('cmake_key'))
+        self.parse_options()
+
+    def __str__(self):
+        line_template = '|{0}    | {1} |  {2} | {3} |'
+        return line_template.format(self.name, self.default, self.conan_type, self.description)
 
 
-class PackageConfig:
-    # XXX add a function to generate a table in markdown format
-    # XXX add description field
-    _data = {
-        "cxxstd":
-        {
-            "default": "c++11",
-            "conan_options": "ANY",
-            "cmake_key": "SDL2PP_CXXSTD"
-        },
-        "static":
-        {
-            "default": True,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_STATIC"
-        },
-        "with_image":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_WITH_IMAGE"
-        },
-        "with_mixer":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_WITH_MIXER"
-        },
-        "with_ttf":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_WITH_TTF"
-        },
-        "with_tests":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_WITH_TESTS"
-        },
-        "with_examples":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_WITH_EXAMPLES"
-        },
-        "enable_livetests":
-        {
-            "default": False,
-            "conan_options": [True, False],
-            "cmake_key": "SDL2PP_ENABLE_LIVE_TESTS"
-        },
-    }
+class PackageConfig(object):
+    def load_config(self):
+        return yaml.load(CONFIG_YAML, Loader=yaml.FullLoader)
 
-    @staticmethod
-    def generate_options():
+    def generate_options(self):
         options = {}
-        for k, v in PackageConfig._data.items():
-            options[k] = v["conan_options"]
+        for k, v in self.load_config()['options'].items():
+            item = ConfigItem(k, v)
+            options[k] = item.conan_type
         return options
 
-    @staticmethod
-    def generate_default_options():
+    def generate_default_options(self):
         default_options = {}
-        for k, v in PackageConfig._data.items():
-            default_options[k] = v["default"]
+        for k, v in self.load_config()['options'].items():
+            item = ConfigItem(k, v)
+            default_options[k] = item.default
         return default_options
 
-    @staticmethod
-    def populate_cmake_configuration(options, cmake_ref):
-        for k, v in options.items():
-            cmake_key = PackageConfig._data[k]["cmake_key"]
-            cmake_ref.definitions[cmake_key] = v
+    def populate_cmake_configuration(self, options, cmake_ref):
+        print("enter cmake config")
+        for k, v in self.load_config()['options'].items():
+            item = ConfigItem(k, v)
+            cmake_ref.definitions[item.cmake_key] = item.default
+
+    def output_markdown_table(self):
+        header = '''
+### Available Package Options
+| Option        | Default | Possible Values  | Description
+|:------------- |:-----------------  |:----------------- |:------------|'''
+        print(header)
+        for k, v in self.load_config()['options'].items():
+            print(str(ConfigItem(k, v)))
 
 
-class SDL2ppConan(ConanFile):
+class SDL2ppConan(ConanFile, PackageConfig):
+    def __init__(self, *args, **kwargs):
+        super(SDL2ppConan, self).__init__(*args, **kwargs)
+        self.options = self.generate_options()
+        self.default_options = self.generate_default_options()
+
     name = "sdl2pp"
     version = "0.16.0"
     description = "C++11 bindings/wrapper for SDL2"
@@ -113,14 +155,22 @@ class SDL2ppConan(ConanFile):
     _source_subfolder = "source_subfolder"
 
     settings = "os", "arch", "compiler", "build_type"
-    options = PackageConfig.generate_options()
-    default_options = PackageConfig.generate_default_options()
 
     def _verify_options(self, stage):
         print("======== begin-stage {} ===========".format(stage))
         for k, v in self.options.items():
             print("self.options {} = {}".format(k, v))
         print("======== end-stage {} ===========".format(stage))
+
+    def _verify_default_options(self, stage):
+        print("======== begin-stage {} ===========".format(stage))
+        for k, v in self.default_options.items():
+            print("self.default_options {} = {}".format(k, v))
+        print("======== end-stage {} ===========".format(stage))
+
+    def _verify_all(self, stage):
+        self._verify_options(stage)
+        self._verify_default_options(stage)
 
     def requirements(self):
         # XXX newer versions blowup on Android due to hid linking issue
@@ -142,7 +192,7 @@ class SDL2ppConan(ConanFile):
         # Ignore JEDI complaining that the install_folder variable doesn't
         # exist, it will at runtime.
         cmake.definitions['CONAN_INSTALL_FOLDER'] = self.install_folder
-        PackageConfig.populate_cmake_configuration(self.options, cmake)
+        self.populate_cmake_configuration(self.options, cmake)
         cmake.configure(build_dir=self._build_subfolder)
         return cmake
 

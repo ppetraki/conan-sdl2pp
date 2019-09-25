@@ -54,3 +54,6 @@ package-uninstall:
 
 format:
 	autopep8 -i conanfile.py
+
+table:
+	python3 -c "import conanfile; conanfile.PackageConfig().output_markdown_table()"

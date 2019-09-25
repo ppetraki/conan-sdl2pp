@@ -17,6 +17,5 @@ https://sdl2pp.amdmi3.ru
 |enable_livetests    | False |  [True, False] | Enable live tests (require X11 display and audio device) |
 
 ### TODO
-- integrate config.yaml into conanfile.py
 - only drive test_package with the optional flags used in the parent build
 - only static libs work on arm. Dynamic libs somehow lose all of their transitive deps
