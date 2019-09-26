@@ -22,17 +22,17 @@ options:
     cmake_key: SDL2PP_STATIC
   with_image:
     description: Enable SDL2_image support
-    default: true
+    default: false
     type: boolean
     cmake_key: SDL2PP_WITH_IMAGE
   with_mixer:
     description: Enable SDL2_mixer support
-    default: true
+    default: false
     type: boolean
     cmake_key: SDL2PP_WITH_MIXER
   with_ttf:
     description: Enable SDL2_ttf support
-    default: true
+    default: false
     type: boolean
     cmake_key: SDL2PP_WITH_TTF
   with_tests:
