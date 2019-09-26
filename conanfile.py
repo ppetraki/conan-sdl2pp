@@ -22,17 +22,17 @@ options:
     cmake_key: SDL2PP_STATIC
   with_image:
     description: Enable SDL2_image support
-    default: false
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_IMAGE
   with_mixer:
-    description: Enable SDL2_ttf support
-    default: false
+    description: Enable SDL2_mixer support
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_MIXER
   with_ttf:
-    description: Enable SDL2_mixer support
-    default: false
+    description: Enable SDL2_ttf support
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_TTF
   with_tests:
@@ -147,7 +147,7 @@ class SDL2ppConan(ConanFile, PackageConfig):
     # there will be less conditions in the upstream cmake as we'll
     # just enable conan *after* the project sets it's defaults so we
     # can get our config in.
-    exports_sources = ['CMakeLists.txt', 'cmake.patch']
+    exports_sources = ['CMakeLists.txt', 'cmake.patch', 'sdl2ttf_path.patch']
 
     generators = ['cmake']
 
@@ -175,6 +175,7 @@ class SDL2ppConan(ConanFile, PackageConfig):
     def requirements(self):
         # XXX newer versions blowup on Android due to hid linking issue
         self.requires.add("sdl2/2.0.8@bincrafters/stable")
+        # XXX add additional requires as extensions are enabled
 
     def source(self):
         tag = "0.16.0"
@@ -183,6 +184,7 @@ class SDL2ppConan(ConanFile, PackageConfig):
         self.run("git clone --branch %s  -- %s %s" %
                  (tag, upstream, self._source_subfolder))
         tools.patch(base_path=self._source_subfolder, patch_file="cmake.patch")
+        tools.patch(base_path=self._source_subfolder, patch_file="sdl2ttf_path.patch")
 
     def _configure_cmake(self):
         cmake = CMake(self)
@@ -205,6 +207,7 @@ class SDL2ppConan(ConanFile, PackageConfig):
     def package(self):
         cmake = self._configure_cmake()
         cmake.install(build_dir=self._build_subfolder)
+        self.copy("*", dst="cmake", src=self._source_subfolder+"/cmake")
 
     def package_info(self):
         self.cpp_info.libs = ["SDL2pp"]

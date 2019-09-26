@@ -1,0 +1,39 @@
+diff --git a/SDL2pp/Font.cc b/SDL2pp/Font.cc
+index 04f84d9..e5841ed 100644
+--- a/SDL2pp/Font.cc
++++ b/SDL2pp/Font.cc
+@@ -22,7 +22,7 @@
+ #include <cassert>
+ #include <vector>
+ 
+-#include <SDL_ttf.h>
++#include <SDL2/SDL_ttf.h>
+ 
+ #include <SDL2pp/Font.hh>
+ #include <SDL2pp/RWops.hh>
+diff --git a/SDL2pp/Font.hh b/SDL2pp/Font.hh
+index 278e02f..69dee05 100644
+--- a/SDL2pp/Font.hh
++++ b/SDL2pp/Font.hh
+@@ -24,7 +24,7 @@
+ 
+ #include <string>
+ 
+-#include <SDL_ttf.h>
++#include <SDL2/SDL_ttf.h>
+ 
+ #include <SDL2pp/Optional.hh>
+ #include <SDL2pp/Point.hh>
+diff --git a/SDL2pp/SDLTTF.cc b/SDL2pp/SDLTTF.cc
+index dfc067b..0eb187d 100644
+--- a/SDL2pp/SDLTTF.cc
++++ b/SDL2pp/SDLTTF.cc
+@@ -19,7 +19,7 @@
+   3. This notice may not be removed or altered from any source distribution.
+ */
+ 
+-#include <SDL_ttf.h>
++#include <SDL2/SDL_ttf.h>
+ 
+ #include <SDL2pp/SDLTTF.hh>
+ #include <SDL2pp/Exception.hh>

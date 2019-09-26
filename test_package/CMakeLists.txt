@@ -6,6 +6,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+# SDL2pp defines it's own Find modules for Image, Mixer, and TTF
+# XXX TTF depends on Image
+list(APPEND CMAKE_MODULE_PATH "${CONAN_SDL2PP_ROOT}/cmake")
+
 find_package(SDL2 REQUIRED)
 include_directories(${SDL2_INCLUDE_DIRS})
 
@@ -20,20 +24,27 @@ ADD_DEFINITIONS(-DTESTDATA_DIR="${PROJECT_SOURCE_DIR}/testdata")
 #
 
 if (EXISTS "${CONAN_INCLUDE_DIRS_SDL2PP}/SDL2pp/SDLImage.hh")
+  find_package(SDL2_image REQUIRED)
   add_definitions(-DWITH_IMAGE)
+  target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARY})
   message(STATUS "SDLImage extension test enabled")
 else()
   message(STATUS "SDLImage extension test disabled")
 endif()
 
 if (EXISTS "${CONAN_INCLUDE_DIRS_SDL2PP}/SDL2pp/SDLMixer.hh")
+  find_package(SDL2_mixer REQUIRED)
   add_definitions(-DWITH_MIXER)
+  target_link_libraries(${PROJECT_NAME} ${SDL2_MIXER_LIBRARY})
   message(STATUS "SDLMixer extension test enabled")
 else()
   message(STATUS "SDLMixer extension test disabled")
 endif()
 
 if (EXISTS "${CONAN_INCLUDE_DIRS_SDL2PP}/SDL2pp/SDLTTF.hh")
+  find_package(SDL2_image REQUIRED)
+  find_package(SDL2_ttf REQUIRED)
+  target_link_libraries(${PROJECT_NAME} ${SDL2_TTF_LIBRARY} ${SDL2_IMAGE_LIBRARY})
   add_definitions(-DWITH_TTF)
   message(STATUS "SDLTTF extension test enabled")
 else()
