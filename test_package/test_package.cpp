@@ -1,3 +1,5 @@
+#include <SDL2/SDL.h>
+
 #include <SDL2pp/SDL.hh>
 #include <SDL2pp/Exception.hh>
 #include <SDL2pp/RWops.hh>
@@ -79,7 +81,11 @@ static void check_mixer() {
 #endif
 
 int main(int argc, char* argv[]) try {
-  { SDL sdl(); }
+  {
+    std::cout << "setup SDL context\n";
+    SDL sdl();
+  }
+  std::cout << "teardown SDL context\n";
 #ifdef WITH_IMAGE
   check_image();
 #endif
