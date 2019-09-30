@@ -22,17 +22,17 @@ options:
     cmake_key: SDL2PP_STATIC
   with_image:
     description: Enable SDL2_image support
-    default: false
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_IMAGE
   with_mixer:
     description: Enable SDL2_mixer support
-    default: false
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_MIXER
   with_ttf:
     description: Enable SDL2_ttf support
-    default: false
+    default: true
     type: boolean
     cmake_key: SDL2PP_WITH_TTF
   with_tests:
@@ -50,6 +50,30 @@ options:
     default: false
     type: boolean
     cmake_key: SDL2PP_ENABLE_LIVE_TESTS
+dependencies:
+    Linux:
+        apt:
+            arch:
+                x86:    i386
+                x86_64: amd64
+                armv7:  armhf
+                armv8:  arm64
+            packages:
+                image: libsdl2-image-dev
+                mixer: libsdl2-mixer-dev
+                ttf:   libsdl2-ttf-dev
+            package_format: "{0}:{1}"
+        yum:
+            arch:
+                x86:    i686
+                x86_64: x86_64
+            packages:
+                image: SDL2_image-devel
+                mixer: SDL2_mixer-devel
+                ttf:   SDL2_ttf-devel
+            package_format: "{0}.{1}"
+    Android:
+        XXX: BuildFromSource
 """
 
 class ConfigItem:
@@ -105,6 +129,9 @@ class PackageConfig(object):
         for k, v in self.load_config()['options'].items():
             item = ConfigItem(k, v)
             cmake_ref.definitions[item.cmake_key] = item.default
+
+    def get_dependencies(self):
+        return self.load_config()['dependencies']
 
     def output_markdown_table(self):
         header = '''
@@ -168,14 +195,53 @@ class SDL2ppConan(ConanFile, PackageConfig):
             print("self.default_options {} = {}".format(k, v))
         print("======== end-stage {} ===========".format(stage))
 
-    def _verify_all(self, stage):
+    def _verify_all(self, stage=""):
         self._verify_options(stage)
         self._verify_default_options(stage)
 
     def requirements(self):
         # XXX newer versions blowup on Android due to hid linking issue
         self.requires.add("sdl2/2.0.8@bincrafters/stable")
-        # XXX add additional requires as extensions are enabled
+
+    def system_requirements(self):
+        if self.settings.os == "Linux" and tools.os_info.is_linux:
+            platform = 'Linux'
+            package_manager = None
+
+            if tools.os_info.with_apt:
+                package_manager = 'apt'
+            elif tools.os_info.with_apt:
+                package_manager = 'yum'
+            else:
+                raise 'package_manager has undefined dependencies!'
+
+            package_manager = self.get_dependencies()[platform][package_manager]
+            print("using package manager %s" % package_manager)
+            packages = []
+
+            if self.options.with_image:
+                packages.append(package_manager['packages']['image'])
+
+            if self.options.with_mixer:
+                packages.append(package_manager['packages']['mixer'])
+
+            if self.options.with_ttf:
+                packages.append(package_manager['packages']['ttf'])
+
+            installer = tools.SystemPackageTool()
+            print ("package list {0}".format(packages))
+            for p in packages:
+                package_format = package_manager['package_format']
+                # why do I need to cast to str?
+                native_arch    = str(self.settings.arch)
+                package_arch   = package_manager['arch'][native_arch]
+                installer.install(package_format.format(p, package_arch))
+        else:
+            print ("dependencies undefined, disabling all extensions!")
+            # XXX is this going to stick?
+            self.options.with_image = false
+            self.options.with_mixer = false
+            self.options.with_ttf = false
 
     def source(self):
         tag = "0.16.0"
