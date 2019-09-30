@@ -32,10 +32,12 @@ static void throw_exception(const char* message, const char* name) {
 }
 
 #ifdef WITH_TTF
+
 static void check_ttf() {
+  std::cout << "checking font\n";
+#ifndef DISABLE_HW_TESTS
   SDL sdl(SDL_INIT_VIDEO);
 
-  std::cout << "checking font\n";
   SDLTTF sdl_ttf;
 
   bool found = false;
@@ -46,28 +48,38 @@ static void check_ttf() {
 
   if (!found) { throw_exception("Failed to get font!", "ttf"); }
   std::cout << "OK!" << std::endl;
+#else
+  std::cout << "OK!" << std::endl;
+#endif
 }
+
 #endif
 
 #ifdef WITH_IMAGE
 // this requires drawing to the screen so just test that we can
 // resolve the symbol and bring the subsystem online.
 static void check_image() {
+  std::cout << "checking image\n";
+#ifndef DISABLE_HW_TESTS
   SDL  sdl(SDL_INIT_VIDEO);
   bool found = false;
 
-  std::cout << "checking image\n";
   SDLImage image();
   // if we didn't throw we're ok
   found = true;
 
   if (!found) { throw_exception("Failed to get image!", "image"); }
   std::cout << "OK!" << std::endl;
+#else
+  std::cout << "OK!" << std::endl;
+#endif
 }
 #endif
 
 #ifdef WITH_MIXER
 static void check_mixer() {
+  std::cout << "checking mixer\n";
+#ifndef DISABLE_HW_TESTS
   SDL  sdl(SDL_INIT_AUDIO);
   bool found = false;
   std::cout << "checking mixer\n";
@@ -77,6 +89,9 @@ static void check_mixer() {
 
   if (!found) { throw_exception("Failed to get mixer!", "mixer"); }
   std::cout << "OK!" << std::endl;
+#else
+  std::cout << "OK!" << std::endl;
+#endif
 }
 #endif
 

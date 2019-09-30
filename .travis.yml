@@ -1,3 +1,5 @@
+env:
+  DISABLE_HW_TESTS=True
 linux: &linux
    os: linux
    dist: xenial
