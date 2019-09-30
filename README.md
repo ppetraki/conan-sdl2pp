@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/ppetraki/conan-sdl2pp.svg?branch=master)](https://travis-ci.com/ppetraki/conan-sdl2pp)
+
 # conan sdl2pp package
 
 C++11 bindings/wrapper for SDL2
