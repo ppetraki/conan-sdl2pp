@@ -23,6 +23,7 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         with tools.environment_append(RunEnvironment(self).vars):
+            print (os.environ)
             bin_path = os.path.join("bin", "test_package")
             if self.settings.os == "Windows":
                 self.run(bin_path)
