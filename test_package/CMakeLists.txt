@@ -20,7 +20,9 @@ target_link_libraries(${PROJECT_NAME} ${CONAN_LIBS} ${SDL2_LIBRARIES})
 ADD_DEFINITIONS(-DTESTDATA_DIR="${PROJECT_SOURCE_DIR}/testdata")
 
 # in travis we're just checking whether we can find the headers and link
-if(DEFINED $ENV{CONAN_DOCKER_IMAGE})
+# this is forwarded by conanfile.py
+if(CONAN_DOCKER_IMAGE)
+  message(WARNING "DISABLING HW TESTS")
   add_definitions(-DDISABLE_HW_TESTS)
 endif()
 

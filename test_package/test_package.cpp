@@ -49,7 +49,7 @@ static void check_ttf() {
   if (!found) { throw_exception("Failed to get font!", "ttf"); }
   std::cout << "OK!" << std::endl;
 #else
-  std::cout << "OK!" << std::endl;
+  std::cout << "(NO HW) OK!" << std::endl;
 #endif
 }
 
@@ -71,7 +71,7 @@ static void check_image() {
   if (!found) { throw_exception("Failed to get image!", "image"); }
   std::cout << "OK!" << std::endl;
 #else
-  std::cout << "OK!" << std::endl;
+  std::cout << "(NO HW) OK!" << std::endl;
 #endif
 }
 #endif
@@ -90,7 +90,7 @@ static void check_mixer() {
   if (!found) { throw_exception("Failed to get mixer!", "mixer"); }
   std::cout << "OK!" << std::endl;
 #else
-  std::cout << "OK!" << std::endl;
+  std::cout << "(NO HW) OK!" << std::endl;
 #endif
 }
 #endif

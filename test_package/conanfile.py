@@ -17,13 +17,16 @@ class TestPackageConan(ConanFile):
             self.build_cmake()
 
     def build_cmake(self):
+        flags = {}
+        if (os.environ.get('CONAN_DOCKER_IMAGE')):
+            flags['CONAN_DOCKER_IMAGE'] = 1
+
         cmake = CMake(self)
-        cmake.configure()
+        cmake.configure(defs=flags)
         cmake.build()
 
     def test(self):
         with tools.environment_append(RunEnvironment(self).vars):
-            print (os.environ)
             bin_path = os.path.join("bin", "test_package")
             if self.settings.os == "Windows":
                 self.run(bin_path)
