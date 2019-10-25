@@ -35,7 +35,7 @@ package:
 	conan package . -sf=$(SRC_FOLDER) -bf=$(BUILD_FOLDER) -pf=$(PACKAGE_FOLDER)
 
 export-package:
-	conan export-pkg . $(CHANNEL)/$(PROJECT_NAME) -f --source-folder=$(SRC_FOLDER) \
+	conan export-pkg . $(CHANNEL)/$(RELEASE) -f --source-folder=$(SRC_FOLDER) \
 		--build-folder=$(BUILD_FOLDER) $(PROFILE)
 
 test: export-package
