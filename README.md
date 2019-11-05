@@ -1,10 +1,19 @@
 [![Build Status](https://travis-ci.com/ppetraki/conan-sdl2pp.svg?branch=master)](https://travis-ci.com/ppetraki/conan-sdl2pp)
 
-# conan sdl2pp package
-
+# Conan sdl2pp package
 C++11 bindings/wrapper for SDL2
 
 https://sdl2pp.amdmi3.ru
+
+# Supported Platforms
+  * Linux (rpm and deb)
+  * Android, all extensions are disabled as conan equivalents do not yet exist
+
+# Local Install
+`make package-install`
+
+# CrossBuild Local Install
+Set the profile and arch in the makefile and `make package-install`
 
 ### Available Package Options
 | Option        | Default | Possible Values  | Description
@@ -19,5 +28,8 @@ https://sdl2pp.amdmi3.ru
 |enable_livetests    | False |  [True, False] | Enable live tests (require X11 display and audio device) |
 
 ### TODO
-- fix find module dependencies for ttf extension
-- only static libs work on arm. Dynamic libs somehow lose all of their transitive deps
+- Only static libs work on arm. Dynamic libs somehow lose all of their transitive deps.
+- Android travis ci. Include all supported archs
+- Port extensions to Conan
+- Windows and Mac support
+- Python based driver vs Makefile
