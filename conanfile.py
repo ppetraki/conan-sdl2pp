@@ -188,6 +188,7 @@ class SDL2ppConan(ConanFile, PackageConfig):
 
     settings = "os", "arch", "compiler", "build_type"
 
+    # debug helpers
     def _verify_options(self, stage):
         print("======== begin-stage {} ===========".format(stage))
         for k, v in self.options.items():
@@ -242,11 +243,11 @@ class SDL2ppConan(ConanFile, PackageConfig):
                 package_arch   = package_manager['arch'][native_arch]
                 installer.install(package_format.format(p, package_arch))
         else:
-            print ("dependencies undefined, disabling all extensions!")
-            # XXX is this going to stick?
-            self.options.with_image = false
-            self.options.with_mixer = false
-            self.options.with_ttf = false
+            print ("dependencies undefined on OS:{0}, "
+                    "disabling all extensions!".format(self.settings.os))
+            self.options.with_image = False
+            self.options.with_mixer = False
+            self.options.with_ttf = False
 
     def source(self):
         tag = "0.16.0"
