@@ -1,7 +1,7 @@
 PROJECT_NAME:=sdl2pp
 PROJECT_VERSION:=0.16.0
 
-#_PROFILE:=-pr arm2
+#_PROFILE:=-pr android_21
 PROFILE:=$(_PROFILE)
 
 CHANNEL:=ppetraki
@@ -15,6 +15,8 @@ PACKAGE_FOLDER:=tmp/package
 # https://github.com/conan-io/conan/issues/2355
 ifneq ($(_PROFILE),)
 	SKIP_TEST:=-tf None
+	ARCH=-s arch=armv7
+	PROFILE:=$(PROFILE) $(ARCH)
 endif
 
 all: clean source install build package
