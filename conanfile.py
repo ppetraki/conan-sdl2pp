@@ -125,10 +125,15 @@ class PackageConfig(object):
         return default_options
 
     def populate_cmake_configuration(self, options, cmake_ref):
-        print("enter cmake config")
+        # XXX why can't I just access options directly as a dict?
+        local_options = dict()
+        for k,v in options.items():
+            local_options[k] = v
+
         for k, v in self.load_config()['options'].items():
             item = ConfigItem(k, v)
-            cmake_ref.definitions[item.cmake_key] = item.default
+            print ("Setting Cmake option: {0} to {1}".format(k, local_options[k]))
+            cmake_ref.definitions[item.cmake_key] = local_options[k]
 
     def get_dependencies(self):
         return self.load_config()['dependencies']
