@@ -108,7 +108,7 @@ class ConfigItem:
 
 class PackageConfig(object):
     def load_config(self):
-        return yaml.load(CONFIG_YAML, Loader=yaml.FullLoader)
+        return yaml.load(CONFIG_YAML, Loader=yaml.SafeLoader)
 
     def generate_options(self):
         options = {}
