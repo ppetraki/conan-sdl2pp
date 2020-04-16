@@ -10,7 +10,12 @@ https://sdl2pp.amdmi3.ru
   * Android, all extensions are disabled as conan equivalents do not yet exist
 
 # Local Install
-`make package-install`
+**Note**: bootstrap.sh will install conan from scratch
+
+`./bootstrap.sh && make package-install`
+
+# Docker Container Integration Test
+`docker build .`
 
 # CrossBuild Local Install
 Set the profile and arch in the makefile and `make package-install`
